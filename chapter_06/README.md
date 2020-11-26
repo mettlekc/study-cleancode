@@ -124,3 +124,57 @@ public class Circle implements Shape {
 - 새 함수 추가할 때 전체 도형 수정
 
 ***모든 것이 객체라는 생각은 미신, 단순한 자료구조와 절차적인 코드가 가정 적합한 상황도 있다***
+
+### 디미터 법칙
+Heuristic, 모듈은 자신이 조작하는 객체의 속사정을 몰라야 한다는 법칙
+
+##### 기차 충돌 (train wreck)
+```java
+final String outputDir = ctxt.getOptions().getScratchDir().getAbsoulutePath();
+``` 
+```java
+Options opts = ctxt.getOptions();
+File scratchDir = opts.getScratchDir();
+final String outputDir = scratchDir.getAbsoulutePath();
+```
+- 디미터 법치 위반 여부
+  - 객체라면 내부 구조를 숨겨야 하므로 디미터 법칙 위반
+  - 자료구조라면 내부구조를 노출해야 하기 때문에 디미터 법칙 적용 안함
+
+##### 잡종 구조
+- 한 클래스 내에서 절반은 객체, 절반은 자료구조
+- Feature Envy (기능 욕심)
+
+##### 구조체 감추기
+(가정) ctxt, options, scratchDir이 객체였다면
+```java
+ctxt.getAbsolutePathOfScratchDirectoryOption();
+```
+- ctxt 객체에 공개해야 하는 메서드가 많음
+
+```java
+ctxt.getScratchDirectoryOption().getAbsolutePath();
+``` 
+- (객체가 아닌) 자료구조를 반환한다고 가정
+
+임시 디렉터리의 절대 경로가 필요한 이유?? (구조체)
+```java
+String outFile = outputDir + "/" + className.replace('.', '/') + ".class";
+FileOutputStream fout = new FileOutputStream(outFile);
+BufferedOutputStream bos = new BufferedOutputStream(fout);
+```
+- 임시 파일을 생성하기 위해
+- ctxt 객체에서 임시파일 생성하도록 위임
+```java
+BufferedOutputStream bos = ctxt.createScratchFileStream(classFileName);
+```
+
+### 자료 전달 객체
+DTO (Data Transfer Object)
+- 공개 변수만 있고, 함수가 없는 클래스
+- Bean 구조 (사이비 캡슐화)
+
+##### 활성 레코드
+- DTO의 특수한 형태
+- save/find와 같은 탐색 함수 제공
+- 결국, 자료구조. 비지니스 규칙을 담으면서 내부자료를 숨기는 객체를 따로 생성
