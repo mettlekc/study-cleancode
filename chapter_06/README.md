@@ -1,4 +1,4 @@
-# 객체와 자료 구조
+# Chapter 06. 객체와 자료 구조
 - private 변수를 get/set 함수로 public 공개하는 이유?
 
 ### 자료 추상화
